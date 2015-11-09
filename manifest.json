@@ -1,0 +1,33 @@
+  {
+     "background": {
+        "scripts": ["jquery.min.js", "jquery.base64.js", "background.js" ]
+     },
+     "content_scripts": [ {
+        "js": ["jquery.min.js", "content.js" ],
+        "css":["css/area-capture.css"],
+        "matches": [ "<all_urls>" ],
+        "run_at": "document_end"
+     } ],
+     "browser_action": {
+         "default_icon": "icon.png",
+         "default_popup": "popup.html",
+         "default_title": "Atero Capture"
+      },
+     "description": "Capture and Edit browser pages.",
+     "icons": {
+        "128": "icon.png",
+        "16": "icon.png",
+        "48": "icon.png"
+     },
+     "manifest_version": 2,
+     "name": "Atero Capture",
+     "permissions": [ "cookies", "activeTab", "tabs", "webNavigation", "webRequest", "<all_urls>", "webRequestBlocking", "contextMenus", "storage", "unlimitedStorage" ],
+     "optional_permissions": ["downloads", "downloads.open"],
+     "version": "1.0.1",
+     "commands": {
+        "save_zoomed_image": {
+          "suggested_key": { "default": "Ctrl+A", "mac": "MacCtrl+A" },
+          "description": "Save Zoomed Image"
+        }
+      }
+  }

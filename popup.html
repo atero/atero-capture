@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>chrome-extension</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="webfontkit-baron/stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="webfontkit-helvetica/stylesheet.css">
+	<link rel="stylesheet" href="font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+</head>
+<body>
+	<div id="counter"><img width=50 height=50 src="images/counting.gif" alt=""></div>
+	<div class="dropdown-container">
+		<i class="fa fa-caret-up"></i>
+		<ul class="choose-category">
+			<li class="visible-part">
+				<a id="capture_visible">
+					<img src="images/visible-part.png">
+					<span class="heading">Capture visible part of page</span>
+					<span class="shortcuts">CTRL+SHIFT+V</span>
+				</a>
+			</li>
+			<li class="delayed-capture">
+				<a id="delayed-capture">
+					<img src="images/timer.png">
+					<span class="heading">Delayed capture</span>
+				</a>
+			</li>
+			<hr>
+			<li class="selacted-area">
+				<a id="capture-selected-area">
+					<img src="images/selected-area.png">
+					<span class="heading">Capture selected area</span>
+					<span class="shortcuts">CTRL+SHIFT+S</span>
+				</a>
+			</li>
+			<li class="entire-page">
+				<a id="capture-entire-page">
+					<img src="images/entire-page.png">
+					<span class="heading">Capture entire page</span>
+					<span class="shortcuts">CTRL+SHIFT+E</span>
+				</a>
+			</li>
+			<li class="your-image">
+				<img src="images/your-image.png">
+				<span class="heading">Select your image</span>
+			</li>
+			<li class="desktop">
+				<img src="images/desktop.png">
+				<span class="heading">Capture desktop</span>
+			</li>
+			<hr>
+			<li class="my-project">
+				<i class="fa fa-home"></i>
+				<span class="heading">My project</span>
+			</li>
+			<li class="settings">
+				<i class="fa fa-cog"></i>
+				<span class="heading">Settings</span>
+			</li>
+			<li class="help">
+				<i class="fa fa-question-circle"></i>
+				<span class="heading">Help</span>
+			</li>
+		</ul>
+	</div>
+</body>
+</html>
