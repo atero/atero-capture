@@ -12,7 +12,7 @@ $(document).ready(function(){
   });
 
   $('#capture-entire-page').click(function(){
-    capture_entire_page();
+    capture_entair_page();
   });
 
   function capture_visible(){
@@ -20,8 +20,10 @@ $(document).ready(function(){
 
     chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, {}, function(dataturl){
       var ateroCapture = {};
-      ateroCapture.imageToEdit = dataturl;
-      console.log(dataturl);
+      ateroCapture.imageData = {}
+      ateroCapture.imageData.imageToEdit = dataturl;
+      ateroCapture.imageData.startEditPoint = {x:-1,y:-1};
+      ateroCapture.imageData.endEditPoint = {x:-1,y:-1};
 
       storage.set(ateroCapture, function(){
         chrome.tabs.create({url: 'edit.html'}, function(){ });
@@ -46,19 +48,10 @@ $(document).ready(function(){
   }
 
   function capture_entair_page(){
-    //chrome.runtime.sendMessage({type: "captureSelectedArea"}, function(response) { });
-    var storage = chrome.storage.local;
 
-    chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, {}, function(dataturl){
-      var ateroCapture = {};
-      ateroCapture.imageToEdit = dataturl;
-      console.log(dataturl);
-
-      storage.set(ateroCapture, function(){
-        chrome.tabs.create({url: 'edit.html'}, function(){ });
-      });
-
-    });
+    chrome.tabs.executeScript(null, {file: "jquery.min.js"});
+    chrome.tabs.executeScript(null, {file: "entairPage.js"});
+    window.close();
 
   }
 });

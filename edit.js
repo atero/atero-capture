@@ -9,12 +9,35 @@ $(document).ready(function(){
   var img = new Image;
   var mainColor = '231, 76, 85';
 
+  function makeTitle(a)
+    {
+     var text = "";
+     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+     for( var i=0; i < a; i++ )
+         text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+     return text;
+    }
+  function _base64ToArrayBuffer(base64) {
+    base64 = base64.split('data:image/jpeg;base64,').join('');
+    var binary_string =  window.atob(base64),
+        len = binary_string.length,
+        bytes = new Uint8Array( len ),
+        i;
+
+    for (i = 0; i < len; i++)        {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
   $("#colorpicker").spectrum({
     color: "#e74c55",
     move: function (color) {
       mainColor = Math.floor(color._r) + ', ' + Math.floor(color._g) + ', ' + Math.floor(color._b);
       console.log('rgb(' + Math.floor(color._r) + ', ' + Math.floor(color._g) + ', ' + Math.floor(color._b) + ')');
-        }
+    }
   });
 
   $('.tool_button').click(function(){
@@ -24,28 +47,116 @@ $(document).ready(function(){
   });
 
   $('.save-atero').click(function(){
-    var image = canvaso.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    var image = _base64ToArrayBuffer(canvaso.toDataURL("image/jpeg"));
+    console.log(image);
+       var encodedString = btoa('atero:qwerty');
+         $.ajax({
+             url: 'http://capture-api.atero.solutions/wp-json/wp/v2/media',
+             type: 'POST',
+             data: image,
+             cache: false,
+             contentType: false,
+             processData: false,
+             headers: {
+                'Content-Disposition': 'filename='+makeTitle(8)+'.jpeg',
+                'Authorization': 'Basic '+encodedString,
+                "Content-Type": "image/jpeg"
+              },
+             success: function(data){
+               console.log(data);
 
-    $.ajax({
-      method: "POST",
-      url: "http://capture.aterostudio.com/api/v1/upload",
-      data: { img : image, fname: 'atero.png' }
-    })
-      .done(function( msg ) {
-        alert( "Data Saved: " + msg );
-      });
+             var mediaId = data['id'];
+             var capture_title = makeTitle(16);
+
+               $.ajax({
+                 type: 'POST',
+                 url: 'http://capture-api.atero.solutions/wp-json/wp/v2/capture/',
+                 dataType: 'json',
+                 headers:{
+                   'Content-Type':'application/x-www-form-urlencoded;text/plain',
+                   'Authorization': 'Basic '+encodedString,
+                   'Accept': 'application/json;odata=verbose'
+                 },
+                 data:{
+                    "title": capture_title,
+                    "content_raw":"Content",
+                    "status": "publish",
+                    "featured_image":mediaId,
+                  }
+
+               })
+
+               .success(function(d) {
+                 console.log(d);
+                 $('input#file').val('');
+               })
+             }
+         });
+
+
   });
 
-  chrome.storage.local.get('imageToEdit', function(result){
-
+  chrome.storage.local.get('imageData', function(result){
     canvaso.height = $(window).height() / ($(window).width() / 1100);
     var ctx = canvaso.getContext('2d');
     var img = new Image;
-    img.onload = function(){
-      ctx.drawImage(img,0,0, 1100, canvaso.height); // Or at whatever offset you like
-    };
-    img.src = result.imageToEdit;
-    console.log(result.imageToEdit);
+    var imageData = result.imageData;
+    var imgArr = imageData.imageArray;
+    console.log(imgArr);
+    if(imgArr){
+      if(imgArr.length > 0){ //if multyimage
+        canvaso.height = imageData.pageH*1100/$(window).width();
+        canvaso.width = 1100;
+        canvas.height = canvaso.height;
+        canvas.width = 1100;
+        var img = new Image;
+        var j = 0;
+        for(var i=0; i < imgArr.length; i++){
+
+
+          //  ctx.drawImage(img,startX, startY, endX-startX, endY-startY, 0,0,endX-startX, endY-startY); // Or at whatever offset you like
+          setTimeout(function(){
+            j++;
+            img.onload = function(){
+              if(j == imgArr.length ){
+                ctx.drawImage(img,0,(j-1)*$(window).height()*1100/$(window).width() - ($(window).height()*(j)*1100/$(window).width()-canvas.height-20), 1100, $(window).height()*1100/$(window).width());
+              }else{
+                ctx.drawImage(img,0,(j-1)*$(window).height()*1100/$(window).width(), 1100, $(window).height()*1100/$(window).width());
+              }
+
+              console.log(img);
+            }
+              img.src = imgArr[j-1];
+              console.log(img.src);
+          }, 500*(i+1));
+
+          }
+      }
+      return;
+    }
+
+    var startX = imageData.startEditPoint.x || 0;
+    var startY = imageData.startEditPoint.y || 0;
+    var endX = imageData.endEditPoint.x || 0;
+    var endY = imageData.endEditPoint.y || 0;
+
+
+    if(startX == endX){
+      img.onload = function(){
+        ctx.drawImage(img,0,0, 1100, canvaso.height); // Or at whatever offset you like
+      }
+    }else{
+      canvaso.height = endY-startY;
+      canvaso.width = endX-startX;
+      canvas.height = endY-startY;
+      canvas.width = endX-startX;
+      img.onload = function(){
+        ctx.drawImage(img,startX, startY, endX-startX, endY-startY, 0,0,endX-startX, endY-startY); // Or at whatever offset you like
+      }
+    }
+    img.src = imageData.imageToEdit;
+    console.log(imageData.imageToEdit);
+    console.log(imageData.startEditPoint);
   });
 
 
@@ -134,7 +245,7 @@ $(document).ready(function(){
     function img_update () {
   		contexto.drawImage(canvas, 0, 0);
   		context.clearRect(0, 0, canvas.width, canvas.height);
-      $('.save-image a').attr('href', canvaso.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+      $('.save-image a').attr('href', canvaso.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream"));
     }
 
     // This object holds the implementation of each drawing tool.
@@ -387,6 +498,27 @@ $(document).ready(function(){
         }
       };
     };
+    tools.txt = function () {
+      this.mousedown = function (ev) {
+        $('.txt_tool').each(function(){
+          if($(this).val() == ''){
+            $(this).remove();
+
+          }
+          console.log($(this).val());
+        });
+        $('.txt_tool').draggable();
+        tool.started = true;
+        tool.x0 = ev._x;
+        tool.y0 = ev._y;
+        var textarea = $.parseHTML('<textarea class="txt_tool"></textarea>');
+        $(textarea).css({color: 'rgb(' + mainColor + ')', top: tool.y0-3, left: tool.x0-3});
+        setTimeout(function() {
+         $(textarea).focus();
+        }, 10);
+        $('#canvas-w').append(textarea);
+      };
+    }
 
 
     init();
