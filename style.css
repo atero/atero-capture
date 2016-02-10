@@ -507,3 +507,33 @@ h1{
 	border: 0;
 	font-family: 'Helvetica';
 }
+
+.tool_button{
+	position: relative;
+}
+
+.tool_button .font-size{
+	position: absolute;
+	left: 0;
+	z-index: 9999;
+	top: 72px;
+
+	background: #fff;
+	display: none;
+}
+
+.font-size .font-size-opt{
+	cursor: pointer;
+	border: 1px solid #eee;
+	padding: 5px 24px;
+}
+
+.font-size .font-size-opt:hover{
+	background: #efefef;
+}
+
+.font-size .px-12{font-size: 12px}
+.font-size .px-24{font-size: 24px}
+.font-size .px-36{font-size: 36px}
+.font-size .px-48{font-size: 48px}
+.font-size .px-60{font-size: 60px}

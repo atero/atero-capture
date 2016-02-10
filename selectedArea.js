@@ -37,12 +37,16 @@ $('body').mouseup(function(e){
   rectEnd.y = e.pageY - endScroll;
   editRect = {rectStart, rectEnd}
   if($('.capture-area').height() > wh){
+    $('.capture-area').remove();
     chrome.runtime.sendMessage({type: "captureSelectedArea", scroll: "true", start: rectStart, end: rectEnd, startScroll:startScroll, endScroll:endScroll }, function(response) { });
   }
   else {
-    chrome.runtime.sendMessage({type: "captureSelectedArea", scroll: "false", start: rectStart, end: rectEnd, startScroll:startScroll, endScroll:endScroll}, function(response) { });
-    }
     $('.capture-area').remove();
+    setTimeout(function() {
+      chrome.runtime.sendMessage({type: "captureSelectedArea", scroll: "false", start: rectStart, end: rectEnd, startScroll:startScroll, endScroll:endScroll}, function(response) { });
+    }, 50);
+    }
+  //  $('.capture-area').remove();
     $('body').removeClass('area-capture');
     console.log('Up!');
   }

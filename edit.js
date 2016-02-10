@@ -1,7 +1,7 @@
 $(document).ready(function(){
   var activeTool = "";
   var imgToEdit = '';
-  var canvas, context, canvaso, contexto;
+  var canvas, context, canvaso, contexto, fontsize = 24;
 
   // The active tool instance.
   var tool;
@@ -44,9 +44,31 @@ $(document).ready(function(){
     $('.tool_button').removeClass('active_tool');
     $(this).addClass('active_tool');
     activeTool = $(this).attr('data-action');
+    if($(this).attr('data-action') == 'txt'){
+      if($('.tool_button .font-size').css('display')=='none'){
+        $('.tool_button .font-size').fadeIn();
+      }
+
+    }
+  });
+
+  $('.font-size-opt').click(function(){
+    $('.font-size').fadeOut('fast');
+    fontsize = $(this).attr('data-size')
   });
 
   $('.save-atero').click(function(){
+    //var c=document.getElementById("myCanvas");
+    var ctx=canvaso.getContext("2d");
+
+    $('.txt_tool').each(function(){
+      ctx.font = fontsize + "px Helvetica";
+      ctx.fillStyle = 'rgb(' + mainColor + ')';
+      ctx.fillText($(this).val(),$(this).position().left-15,$(this).position().top-4);
+      $(this).remove();
+      console.log('print');
+    });
+
     var image = _base64ToArrayBuffer(canvaso.toDataURL("image/jpeg"));
     console.log(image);
        var encodedString = btoa('atero:qwerty');
@@ -512,7 +534,7 @@ $(document).ready(function(){
         tool.x0 = ev._x;
         tool.y0 = ev._y;
         var textarea = $.parseHTML('<textarea class="txt_tool"></textarea>');
-        $(textarea).css({color: 'rgb(' + mainColor + ')', top: tool.y0-3, left: tool.x0-3});
+        $(textarea).css({color: 'rgb(' + mainColor + ')', top: tool.y0, left: tool.x0, 'fontSize':fontsize+'px'});
         setTimeout(function() {
          $(textarea).focus();
         }, 10);
