@@ -1,91 +1,110 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>chrome-extension</title>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="/css/bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="webfontkit-baron/stylesheet.css">
-	<link rel="stylesheet" type="text/css" href="webfontkit-helvetica/stylesheet.css">
-	<link rel="stylesheet" href="font-awesome/css/font-awesome.css">
-	<link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script type="text/javascript" src="jquery.min.js"></script>
-	<script src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="edit.js"></script>
-	<script src='spectrum.js'></script>
-	<link rel='stylesheet' href='spectrum.css' />
-</head>
-<body id="editScreen">
-	<div id="header">
-		<div class="container">
-			<div class="row">
-				<a href="">
-					<h1 class="col-sm-2 left0 right0">AteroCapture</h1>
-				</a>
-				<ul class="tool-border col-sm-6 left0 right0">
-					<li data-action="crop" class="crop tool_button">
-						<i class="fa fa-crop"></i>
-					</li>
-					<li data-action="rect" class="square tool_button">
-						<i class="fa fa-square-o"></i>
-					</li>
-					<!-- <li data-action="draw-circle" class="circle tool_button">
+    <head>
+        <title>chrome-extension</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="webfontkit-baron/stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="webfontkit-helvetica/stylesheet.css">
+        <link rel="stylesheet" href="font-awesome/css/font-awesome.css">
+        <link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" src="jquery.min.js"></script>
+        <script src="jquery-ui/jquery-ui.min.js"></script>
+        <script src="bootstrap.min.js"></script>
+        <script type="text/javascript" src="edit.js"></script>
+        <script src='spectrum.js'></script>
+        <link rel='stylesheet' href='spectrum.css'/>
+    </head>
+    <body id="editScreen">
+        <div id="header">
+            <div class="container">
+                <div class="row">
+                    <a href="">
+                        <h1 class="col-sm-2 left0 right0">AteroCapture</h1>
+                    </a>
+                    <ul class="tool-border col-sm-6 left0 right0">
+                        <li data-action="crop" class="crop tool_button">
+                            <i class="fa fa-crop"></i>
+                        </li>
+                        <li data-action="rect" class="square tool_button">
+                            <i class="fa fa-square-o"></i>
+                        </li>
+                        <!-- <li data-action="draw-circle" class="circle tool_button">
 						<i class="fa fa-circle-thin"></i>
 					</li>
 					<li data-action="measure" class="ruler tool_button">
 						<i class="fa fa-arrows-h"></i>
 					</li>-->
-					<li data-action="arrow" class="arrow tool_button">
-						<i class="fa fa-long-arrow-up"></i>
-					</li>
-					<li data-action="pencil" class="pencil tool_button">
-						<i class="fa fa-pencil"></i>
-					</li>
-					<li data-action="mark" class="brush tool_button">
-						<i class="fa fa-paint-brush"></i>
-					</li>
-					<!--<li data-action="blur" class="blur tool_button">
+                        <li data-action="arrow" class="arrow tool_button">
+                            <i class="fa fa-long-arrow-up"></i>
+                        </li>
+                        <li data-action="pencil" class="pencil tool_button">
+                            <i class="fa fa-pencil"></i>
+                        </li>
+                        <li data-action="mark" class="brush tool_button">
+                            <i class="fa fa-paint-brush"></i>
+                        </li>
+                        <!--<li data-action="blur" class="blur tool_button">
 						<i class="fa fa-tint"></i>
 					</li>-->
-					<li data-action="txt" class="font tool_button">
-						<i class="fa fa-font"></i>
-						<div class="font-size">
-							<div data-size="12" class="font-size-opt px-12">12px</div>
-							<div data-size="24" class="font-size-opt px-24">24px</div>
-							<div data-size="36" class="font-size-opt px-36">36px</div>
-							<div data-size="48" class="font-size-opt px-48">48px</div>
-							<div data-size="60" class="font-size-opt px-60">60px</div>
-						</div>
-					</li>
-					<li class="color">
-	<input id='colorpicker' />
-					</li>
-				</ul>
-				<div class="next col-sm-4">
-					<div class="save-image  col-sm-4 pull-left" style="text-align:center">
-						<a download='ateroCapture.png'><span class="save-image-icon"></span></a>
-						<span class="save-image-text">Save image</span>
-					</div>
-					<div class="save-atero  col-sm-4 pull-left" style="text-align:center">
-						<a><span class="save-atero-icon"></span></a>
-						<span class="save-atero-text">Save On Atero</span>
-					</div>
-				<!--	<div class="next-button">
+                        <li data-action="txt" class="font tool_button">
+                            <i class="fa fa-font"></i>
+                            <div class="font-size">
+                                <div data-size="12" class="font-size-opt px-12">12px</div>
+                                <div data-size="24" class="font-size-opt px-24">24px</div>
+                                <div data-size="36" class="font-size-opt px-36">36px</div>
+                                <div data-size="48" class="font-size-opt px-48">48px</div>
+                                <div data-size="60" class="font-size-opt px-60">60px</div>
+                            </div>
+                        </li>
+                        <li data-action="line" class="tool_button" id="line" data-width="4">
+                          <span class="data-width"></span>
+                          <span class="line-px">4px</span>
+                          <div class="line-width">
+                              <div data-size="2" class="arrow-line-width"><span class="px-2 pull-left"> </span> <span class="pull-left"> 2px</span></div>
+                              <div data-size="4" class="arrow-line-width"><span class="px-4 pull-left"> </span> <span class="pull-left"> 4px</span></div>
+                              <div data-size="6" class="arrow-line-width"><span class="px-6 pull-left"> </span> <span class="pull-left"> 6px</span></div>
+                              <div data-size="8" class="arrow-line-width"><span class="px-8 pull-left"> </span> <span class="pull-left"> 8px</span></div>
+                          </div>
+                        </li>
+                        <li data-action="undo-redo" class="undo-redo">
+                            <i id="undo" class="fa fa-undo none" aria-hidden="true"></i>
+                            <i id="redo" class="fa fa-repeat none" aria-hidden="true"></i>
+                        </li>
+                        <li class="color">
+                            <input id='colorpicker'/>
+                        </li>
+                    </ul>
+                    <div class="next col-sm-4">
+                        <div class="save-image  col-sm-3 pull-left" style="text-align:center">
+                            <a download='ateroCapture.png' data-toggle="tooltip" data-placement="bottom" title="Save image">
+                                <span class="save-image-icon"></span>
+                            </a>
+                            <!-- <span class="save-image-text">Save image</span> -->
+                        </div>
+                        <div class="save-atero  col-sm-3 pull-left" style="text-align:center">
+                            <a data-toggle="tooltip" data-placement="bottom" title="Save local">
+                                <span class="save-atero-icon"></span>
+                            </a>
+                            <!-- <span class="save-atero-text">Save On Atero</span> -->
+                        </div>
+                        <!--	<div class="next-button">
 						<a href="save.html">
 							<span class="next-text">Next</span>
 							<span class="next-icon"></span>
 						</a>
 					</div> -->
-				</div>
-				<div class="clear clearfix"></div>
-				<div class="col-sm-12" id="canvas-w">
-					<canvas id="edit-area" width="1100" height="700" style="border:1px solid #999;"></canvas>
+                    </div>
+                    <div class="clear clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="clear clearfix"></div>
+        <div class="col-sm-12 text-center" id="canvas-w">
+            <canvas id="edit-area" width="1100" height="700"></canvas>
+            <img id="" src="" alt="">
+        </div>
 
-					<img id="" src="" alt="">
-				</div>
-			</div>
-		</div>
-	</div>
-
-</body>
+    </body>
 </html>

@@ -8,14 +8,31 @@ chrome.runtime.onMessage.addListener(
           var ateroCapture = {};
           ateroCapture.imageData = {}
           ateroCapture.imageData.imageToEdit = dataturl;
-          ateroCapture.imageData.startEditPoint = {'x':-1,'y':-1};
-          ateroCapture.imageData.endEditPoint = {'x':-1,'y':-1};
+          ateroCapture.imageData.startEditPoint = {'x':0,'y':0};
+          ateroCapture.imageData.endEditPoint = {'x':request.start-15,'y':request.end};
           storage.set(ateroCapture, function(){
             chrome.tabs.create({url: 'edit.html'}, function(){ });
           });
         });
-      }, 3000);
+      }, 2500);
   	}
+
+    if (request.type == 'capture_visible') {
+      chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, {}, function(dataturl){
+        var ateroCapture = {};
+        ateroCapture.imageData = {}
+        ateroCapture.imageData.imageToEdit = dataturl;
+        ateroCapture.imageData.startEditPoint = {'x':0,'y':0};
+        ateroCapture.imageData.endEditPoint = {'x':request.start-15,'y':request.end};
+
+        storage.set(ateroCapture, function(){
+          chrome.tabs.create({url: 'edit.html'}, function(){ });
+        });
+
+        //open edit page
+
+      });
+    }
 
     if (request.type == 'captureSelectedArea') {
       if(request.scroll == "false"){

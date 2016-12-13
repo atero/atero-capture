@@ -16,28 +16,16 @@ $(document).ready(function(){
   });
 
   function capture_visible(){
-    var storage = chrome.storage.local;
-
-    chrome.tabs.captureVisibleTab(chrome.windows.WINDOW_ID_CURRENT, {}, function(dataturl){
-      var ateroCapture = {};
-      ateroCapture.imageData = {}
-      ateroCapture.imageData.imageToEdit = dataturl;
-      ateroCapture.imageData.startEditPoint = {x:-1,y:-1};
-      ateroCapture.imageData.endEditPoint = {x:-1,y:-1};
-
-      storage.set(ateroCapture, function(){
-        chrome.tabs.create({url: 'edit.html'}, function(){ });
-      });
-
-      //open edit page
-
-    });
+    chrome.tabs.executeScript(null, {file: "jquery.min.js"});
+    chrome.tabs.executeScript(null, {file: "visible.js"});
+    window.close();
   }
 
   function delayed_capture(){
     $('.dropdown-container').css({'width':'50px', 'height': '50px'});
     $('#counter').show();
-    chrome.runtime.sendMessage({type: "delayedCapture"}, function(response) { });
+    chrome.tabs.executeScript(null, {file: "jquery.min.js"});
+    chrome.tabs.executeScript(null, {file: "delayed.js"});
   }
 
   function capture_selected_area(){

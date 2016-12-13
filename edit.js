@@ -1,13 +1,15 @@
 $(document).ready(function(){
   var activeTool = "";
   var imgToEdit = '';
-  var canvas, context, canvaso, contexto, fontsize = 24;
+  var canvas, context, canvaso, contexto, fontsize = 24, arrowLineWidth = 4;
 
   // The active tool instance.
   var tool;
   var tool_default = 'line';
   var img = new Image;
   var mainColor = '231, 76, 85';
+
+  $('[data-toggle="tooltip"]').tooltip();
 
   function makeTitle(a)
     {
@@ -41,6 +43,12 @@ $(document).ready(function(){
   });
 
   $('.tool_button').click(function(){
+    if($('.tool_button .line-width').css('display')=='block'){
+      $('.tool_button .line-width').fadeOut();
+    }
+    if($('.tool_button .font-size').css('display')=='block'){
+      $('.tool_button .font-size').fadeOut();
+    }
     $('.tool_button').removeClass('active_tool');
     $(this).addClass('active_tool');
     activeTool = $(this).attr('data-action');
@@ -48,13 +56,30 @@ $(document).ready(function(){
       if($('.tool_button .font-size').css('display')=='none'){
         $('.tool_button .font-size').fadeIn();
       }
-
+      if($('.tool_button .line-width').css('display')=='block'){
+        $('.tool_button .line-width').fadeOut();
+      }
+    }
+    if($(this).attr('data-action') == 'line'){
+      if($('.tool_button .line-width').css('display')=='none'){
+        $('.tool_button .line-width').fadeIn();
+      }
+      if($('.tool_button .font-size').css('display')=='block'){
+        $('.tool_button .font-size').fadeOut();
+      }
     }
   });
 
   $('.font-size-opt').click(function(){
     $('.font-size').fadeOut('fast');
     fontsize = $(this).attr('data-size')
+  });
+
+  $('.arrow-line-width').click(function(){
+    $('.line-width').fadeOut('fast');
+    arrowLineWidth = $(this).attr('data-size');
+    $('li#line').attr('data-width', arrowLineWidth);
+    $('span.line-px').text(arrowLineWidth + 'px');
   });
 
   $('.save-atero').click(function(){
@@ -71,17 +96,17 @@ $(document).ready(function(){
 
     var image = _base64ToArrayBuffer(canvaso.toDataURL("image/jpeg"));
     console.log(image);
-       var encodedString = btoa('atero:qwerty');
+       var encodedString = btoa('anonimous:anonimous');
          $.ajax({
-             url: 'http://capture-api.atero.solutions/wp-json/wp/v2/media',
+             url: 'http://capture.atero.solutions/wp-json/wp/v2/media',
              type: 'POST',
              data: image,
              cache: false,
              contentType: false,
              processData: false,
              headers: {
-                'Content-Disposition': 'filename='+makeTitle(8)+'.jpeg',
-                'Authorization': 'Basic '+encodedString,
+                "Content-Disposition": 'filename='+makeTitle(8)+'.jpeg',
+                "Authorization": '"' + 'Basic ' + encodedString + '"',
                 "Content-Type": "image/jpeg"
               },
              success: function(data){
@@ -92,7 +117,7 @@ $(document).ready(function(){
 
                $.ajax({
                  type: 'POST',
-                 url: 'http://capture-api.atero.solutions/wp-json/wp/v2/capture/',
+                 url: 'http://capture.atero.solutions/wp-json/wp/v2/capture/',
                  dataType: 'json',
                  headers:{
                    'Content-Type':'application/x-www-form-urlencoded;text/plain',
@@ -177,8 +202,8 @@ $(document).ready(function(){
       }
     }
     img.src = imageData.imageToEdit;
-    console.log(imageData.imageToEdit);
-    console.log(imageData.startEditPoint);
+    // console.log(imageData.imageToEdit);
+    // console.log(imageData.startEditPoint);
   });
 
 
@@ -264,11 +289,78 @@ $(document).ready(function(){
     // This function draws the #imageTemp canvas on top of #imageView, after which
     // #imageTemp is cleared. This function is called each time when the user
     // completes a drawing operation.
+
+    // START - Undo Redo functionality
+      var undoRedo = new Array();
+      var newundoRedo = new Array();
+      var unStep = -1;
+
+
     function img_update () {
+      $('#undo').removeClass('none');
+      unStep++;
+      while (undoRedo.length > 20) {
+          undoRedo.shift();
+          unStep--;
+      }
+      if (unStep !== 0 && unStep < undoRedo.length) {
+          undoRedo.length = unStep;
+          unStep++;
+      } else {
+          undoRedo.length = unStep;
+      }
+
   		contexto.drawImage(canvas, 0, 0);
   		context.clearRect(0, 0, canvas.width, canvas.height);
-      $('.save-image a').attr('href', canvaso.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream"));
+      undoRedo.push(document.getElementById('edit-area').toDataURL());
+      if (newundoRedo.length == 0) {
+        $('.save-image a').attr('href', undoRedo[undoRedo.length - 1]);
+      }else {
+        $('.save-image a').attr('href', newundoRedo[newundoRedo.length - 1]);
+      }
     }
+
+    function Undo() {
+        if (unStep > -1) {
+            unStep--;
+            var canvasPic = new Image();
+            canvasPic.src = undoRedo[unStep];
+            canvasPic.onload = function () { context.drawImage(canvasPic, 0, 0); }
+            newundoRedo.push(canvasPic.src);
+            $('.save-image a').attr('href', canvasPic.src);
+        }
+    }
+
+    function Redo() {
+        if (unStep < undoRedo.length - 1) {
+            unStep++;
+            var canvasPic = new Image();
+            canvasPic.src = undoRedo[unStep];
+            canvasPic.onload = function () { context.drawImage(canvasPic, 0, 0); }
+            newundoRedo.push(canvasPic.src);
+            $('.save-image a').attr('href', canvasPic.src);
+        }
+    }
+
+    $('#undo').click(function(event) {
+      $('#redo').removeClass('none');
+      if (unStep >= 1) {
+        Undo();
+      }else{
+        $(this).addClass('none');
+      }
+    });
+
+    $('#redo').click(function(event) {
+      $('#undo').removeClass('none');
+      if (unStep == undoRedo.length - 1) {
+        $(this).addClass('none');
+      }
+      Redo();
+    });
+
+  // END - Undo Redo functionality
+
 
     // This object holds the implementation of each drawing tool.
     var tools = {};
@@ -292,7 +384,7 @@ $(document).ready(function(){
       this.mousemove = function (ev) {
         if (tool.started) {
           context.strokeStyle = 'rgb(' + mainColor + ')';
-          context.lineWidth=2;
+          context.lineWidth = arrowLineWidth;
           context.lineTo(ev._x, ev._y);
           context.stroke();
         }
@@ -327,7 +419,7 @@ $(document).ready(function(){
       this.mousemove = function (ev) {
         if (tool.started) {
           context.strokeStyle = 'rgba(' + mainColor + ', 0.05)';
-          context.lineWidth=10;
+          context.lineWidth = arrowLineWidth;
           context.lineTo(ev._x, ev._y);
           context.stroke();
         }
@@ -370,7 +462,7 @@ $(document).ready(function(){
           return;
         }
         context.strokeStyle = 'rgb(' + mainColor + ')';
-        context.lineWidth = 3;
+        context.lineWidth = arrowLineWidth;
         context.strokeRect(x, y, w, h);
       };
 
@@ -440,7 +532,7 @@ $(document).ready(function(){
         context.moveTo(tool.x0, tool.y0);
         context.lineTo(ev._x,   ev._y);
         context.strokeStyle = 'rgb(' + mainColor + ')';
-        context.lineWidth = 8;
+        context.lineWidth = arrowLineWidth;
         context.stroke();
 
         //starting a new path from the head of the arrow to one of the sides of the point
@@ -457,7 +549,7 @@ $(document).ready(function(){
 
         //draws the paths created above
         context.strokeStyle = 'rgb(' + mainColor + ')';
-        context.lineWidth = 10;
+        context.lineWidth = parseInt(arrowLineWidth) + 2;
         context.stroke();
         context.fillStyle = 'rgb(' + mainColor + ')';
         context.fill();
@@ -533,13 +625,32 @@ $(document).ready(function(){
         tool.started = true;
         tool.x0 = ev._x;
         tool.y0 = ev._y;
-        var textarea = $.parseHTML('<textarea class="txt_tool"></textarea>');
+        var textarea = $.parseHTML('<textarea class="txt_tool" id="drag-text"></textarea>');
         $(textarea).css({color: 'rgb(' + mainColor + ')', top: tool.y0, left: tool.x0, 'fontSize':fontsize+'px'});
         setTimeout(function() {
          $(textarea).focus();
         }, 10);
         $('#canvas-w').append(textarea);
+
       };
+      var $dragging = null;
+      $('#canvas-w').on("mousedown", "#drag-text", function(e) {
+          $(this).attr('unselectable', 'on').addClass('draggable');
+          var el_w = $('.draggable').outerWidth(),
+              el_h = $('.draggable').outerHeight();
+          $('body').on("mousemove", function(e) {
+              if ($dragging) {
+                  $dragging.offset({
+                      top: e.pageY - el_h / 2,
+                      left: e.pageX - el_w / 2
+                  });
+              }
+          });
+          $dragging = $(e.target);
+      }).on("mouseup", ".draggable", function(e) {
+          $dragging = null;
+          $(this).removeAttr('unselectable').removeClass('draggable');
+      });
     }
 
 

@@ -5,7 +5,7 @@ var shotCount = Math.floor(pageH / winH)+1;
 var imageArray = [];
 console.log('Scroll : ' + $(document).scrollTop());
 
-if($(document).scrollTop()!=0){
+if($(document).scrollTop()!=0 || $(document).scrollTop()==0){
   $('body').animate({scrollTop: 0}, 100,function(){
     console.log('Scroll : ' + $(document).scrollTop());
     //shoot
